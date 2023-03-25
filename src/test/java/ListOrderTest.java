@@ -1,10 +1,10 @@
+import client.OrderClient;
+import client.UserClient;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Test;
-import pageobject.OrderPageObject;
-import pageobject.UserPageObject;
 import pojo.User;
 
 import static datatest.UserDataTest.getUserAllField;
@@ -12,14 +12,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class ListOrderTest {
-    UserPageObject userPageObject;
-    User user;
-    String accessToken;
+    public static UserClient userClient;
+    public static User user;
+    public static String accessToken;
 
     @After
     public void deleteUser() {
         if (accessToken != null) {
-            userPageObject.delete(accessToken);
+            userClient.delete(accessToken);
         }
     }
 
@@ -27,9 +27,9 @@ public class ListOrderTest {
     @DisplayName("Получение списка заказов после авторизации")
     @Description("При получении списка заказов после авторизации возвращается корректный список заказов и код 200")
     public void getListOrderWithAuth() {
-        userPageObject = new UserPageObject();
+        userClient = new UserClient();
         user = getUserAllField();
-        accessToken = userPageObject.create(user)
+        accessToken = userClient.create(user)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -38,7 +38,7 @@ public class ListOrderTest {
                 .extract()
                 .path("accessToken");
 
-        OrderPageObject orderPageObject = new OrderPageObject();
+        OrderClient orderPageObject = new OrderClient();
         Response response = orderPageObject.getOrdersListWithAuth(accessToken);
         response.then().statusCode(200)
                 .and()
@@ -49,7 +49,7 @@ public class ListOrderTest {
     @DisplayName("Получение списка заказов без авторизации")
     @Description("При получении списка заказов без авторизации возвращается код 401 и сообщение You should be authorized")
     public void getListOrderWithoutAuth() {
-        OrderPageObject orderPageObject = new OrderPageObject();
+        OrderClient orderPageObject = new OrderClient();
         Response response = orderPageObject.getOrdersListWithoutAuth();
         response.then().statusCode(401)
                 .and()

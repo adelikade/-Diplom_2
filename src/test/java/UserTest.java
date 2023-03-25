@@ -1,9 +1,9 @@
+import client.UserClient;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Test;
-import pageobject.UserPageObject;
 import pojo.User;
 
 import static datatest.UserDataTest.getUserAllField;
@@ -12,14 +12,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class UserTest {
-    UserPageObject userPageObject;
-    User user;
-    String accessToken;
+    public static UserClient userClient;
+    public static User user;
+    public static String accessToken;
 
     @After
     public void deleteUser() {
         if (accessToken != null) {
-            userPageObject.delete(accessToken);
+            userClient.delete(accessToken);
         }
     }
 
@@ -27,9 +27,9 @@ public class UserTest {
     @DisplayName("Создание уникального пользователя")
     @Description("Можно создать уникального пользователя: возвращается код 200 и \"success\":true")
     public void createUser() {
-        userPageObject = new UserPageObject();
+        userClient = new UserClient();
         user = getUserAllField();
-        accessToken = userPageObject.create(user)
+        accessToken = userClient.create(user)
                 .then()
                 .statusCode(200)
                 .and()
@@ -44,9 +44,9 @@ public class UserTest {
     @DisplayName("Создание уже существующего пользователя")
     @Description("Если пользователь уже существует, возвращается код 403 и сообщение \"User already exists\"")
     public void createDoubleUser() {
-        userPageObject = new UserPageObject();
+        userClient = new UserClient();
         user = getUserAllField();
-        accessToken = userPageObject.create(user)
+        accessToken = userClient.create(user)
                 .then()
                 .statusCode(200)
                 .and()
@@ -56,7 +56,7 @@ public class UserTest {
                 .extract()
                 .path("accessToken");
 
-        Response response = userPageObject.create(user);
+        Response response = userClient.create(user);
         response.then()
                 .statusCode(403)
                 .and()
@@ -67,9 +67,9 @@ public class UserTest {
     @DisplayName("Создание пользователя без одного из обязательных полей")
     @Description("Если нет одного из обязательных полей, вернется код 403 и сообщение \"Email, password and name are required fields\"")
     public void createUserWithoutOneField() {
-        userPageObject = new UserPageObject();
+        userClient = new UserClient();
         user = getUserWithoutOneField();
-        Response response = userPageObject.create(user);
+        Response response = userClient.create(user);
         response.then()
                 .statusCode(403)
                 .and()

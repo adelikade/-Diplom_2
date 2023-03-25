@@ -1,10 +1,10 @@
+import client.OrderClient;
+import client.UserClient;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Test;
-import pageobject.OrderPageObject;
-import pageobject.UserPageObject;
 import pojo.Order;
 import pojo.User;
 
@@ -14,14 +14,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class OrderTest {
-    UserPageObject userPageObject;
-    User user;
-    String accessToken;
+    public static UserClient userClient;
+    public static User user;
+    public static String accessToken;
 
     @After
     public void deleteUser() {
         if (accessToken != null) {
-            userPageObject.delete(accessToken);
+            userClient.delete(accessToken);
         }
     }
 
@@ -29,9 +29,9 @@ public class OrderTest {
     @DisplayName("Создание заказа после авторизации с ингредиентами")
     @Description("При создании заказа после авторизации с ингредиентами возвращается код 200 и \"success\":true")
     public void createOrderWithAuthAndIngredients() {
-        userPageObject = new UserPageObject();
+        userClient = new UserClient();
         user = getUserAllField();
-        accessToken = userPageObject.create(user)
+        accessToken = userClient.create(user)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -41,7 +41,7 @@ public class OrderTest {
                 .path("accessToken");
 
         Order order = getOrderWithValidIngredients();
-        OrderPageObject orderPageObject = new OrderPageObject();
+        OrderClient orderPageObject = new OrderClient();
         Response response = orderPageObject.createOrderWithAuth(order, accessToken);
         response.then()
                 .statusCode(200)
@@ -53,9 +53,9 @@ public class OrderTest {
     @DisplayName("Создание заказа после авторизации с некорректным хешем ингредиентов")
     @Description("При создании заказа после авторизации с некорректным хешем ингредиентов возвращается код 500")
     public void createOrderWithIncorrectIngredients() {
-        userPageObject = new UserPageObject();
+        userClient = new UserClient();
         user = getUserAllField();
-        Response responseCreate = userPageObject.create(user);
+        Response responseCreate = userClient.create(user);
         accessToken = responseCreate
                 .then()
                 .assertThat()
@@ -66,7 +66,7 @@ public class OrderTest {
                 .path("accessToken");
 
         Order orderCreateRequest = getOrderWithInvalidIngredients();
-        OrderPageObject orderPageObject = new OrderPageObject();
+        OrderClient orderPageObject = new OrderClient();
         Response response = orderPageObject.createOrderWithAuth(orderCreateRequest, accessToken);
         response.then()
                 .statusCode(500);
@@ -77,7 +77,7 @@ public class OrderTest {
     @Description("При создании заказа без авторизации с ингредиентами возвращается код 200 и \"success\":true")
     public void createOrderWithoutAuth() {
         Order orderCreateRequest = getOrderWithValidIngredients();
-        OrderPageObject orderPageObject = new OrderPageObject();
+        OrderClient orderPageObject = new OrderClient();
         Response response = orderPageObject.createOrderWithoutAuth(orderCreateRequest);
         response.then()
                 .statusCode(200)
@@ -89,9 +89,9 @@ public class OrderTest {
     @DisplayName("Создание заказа без авторизации и без ингредиентов")
     @Description("При создании заказа без авторизации и без ингредиентов возвращается код 400 and сообщение Ingredient ids must be provided")
     public void createOrderWithoutIngredients() {
-        userPageObject = new UserPageObject();
+        userClient = new UserClient();
         user = getUserAllField();
-        Response responseCreate = userPageObject.create(user);
+        Response responseCreate = userClient.create(user);
         accessToken = responseCreate
                 .then()
                 .assertThat()
@@ -102,7 +102,7 @@ public class OrderTest {
                 .path("accessToken");
 
         Order orderCreateRequest = getOrderWithoutIngredients();
-        OrderPageObject orderPageObject = new OrderPageObject();
+        OrderClient orderPageObject = new OrderClient();
         Response response = orderPageObject.createOrderWithAuth(orderCreateRequest, accessToken);
         response.then()
                 .statusCode(400)

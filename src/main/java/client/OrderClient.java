@@ -1,4 +1,4 @@
-package pageobject;
+package client;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
@@ -7,7 +7,7 @@ import pojo.Order;
 import static configuration.Configuration.getBaseUri;
 import static io.restassured.RestAssured.given;
 
-public class OrderPageObject {
+public class OrderClient {
     @Step("Создание заказа после авторизации")
     public Response createOrderWithAuth(Order orderCreate, String accessToken) {
         return given()

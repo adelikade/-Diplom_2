@@ -1,9 +1,9 @@
+import client.UserClient;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Test;
-import pageobject.UserPageObject;
 import pojo.UpdateUser;
 import pojo.User;
 
@@ -15,15 +15,15 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class UpdateUserTest {
-    UserPageObject userPageObject;
-    User user;
-    String accessToken;
-    UpdateUser updateUser;
+    public static UserClient userClient;
+    public static User user;
+    public static String accessToken;
+    public static UpdateUser updateUser;
 
     @After
     public void deleteUser() {
         if (accessToken != null) {
-            userPageObject.delete(accessToken);
+            userClient.delete(accessToken);
         }
     }
 
@@ -31,9 +31,9 @@ public class UpdateUserTest {
     @DisplayName("Изменение данных пользователя после авторизации")
     @Description("При изменении данных пользователя после авторизации возвращается код 200 и \"success\":true")
     public void updateUserWithAuth() {
-        userPageObject = new UserPageObject();
+        userClient = new UserClient();
         user = getUserAllField();
-        accessToken = userPageObject.create(user)
+        accessToken = userClient.create(user)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -43,7 +43,7 @@ public class UpdateUserTest {
                 .path("accessToken");
 
         updateUser = getUserUpdate();
-        Response response = userPageObject.updateWithAuth(updateUser, accessToken);
+        Response response = userClient.updateWithAuth(updateUser, accessToken);
         response.then()
                 .statusCode(200)
                 .and()

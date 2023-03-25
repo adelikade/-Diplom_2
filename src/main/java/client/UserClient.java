@@ -1,4 +1,4 @@
-package pageobject;
+package client;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
@@ -9,7 +9,7 @@ import pojo.User;
 import static configuration.Configuration.getBaseUri;
 import static io.restassured.RestAssured.given;
 
-public class UserPageObject {
+public class UserClient {
     @Step("Регистрация пользователя")
     public Response create(User userRequest) {
         return given()
